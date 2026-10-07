@@ -1,0 +1,203 @@
+package com.example.backend.service;
+
+import com.example.backend.entity.Product;
+import com.example.backend.repository.ProductRepository;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class ProductService {
+
+    private final ProductRepository repository;
+
+    public ProductService(ProductRepository repository) {
+        this.repository = repository;
+    }
+
+    // ================================
+    // ADD PRODUCT
+    // ================================
+
+    public Product addProduct(Product product) {
+
+        product.setRequestStatus("NONE");
+
+        product.setRequestedQuantity(0);
+
+        product.setRequestedBy(null);
+
+        return repository.save(product);
+    }
+
+    // ================================
+    // GET ALL PRODUCTS
+    // ================================
+
+    public List<Product> getAllProducts() {
+
+        return repository.findAll();
+    }
+
+    // ================================
+    // GET PRODUCT BY ID
+    // ================================
+
+    public Product getProduct(Long id) {
+
+        return repository.findById(id).orElse(null);
+    }
+
+    // ================================
+    // UPDATE PRODUCT
+    // ================================
+
+    public Product updateProduct(
+            Long id,
+            Product product) {
+
+        Product existing =
+                repository.findById(id).orElse(null);
+
+        if (existing == null) {
+            return null;
+        }
+
+        existing.setProductName(
+                product.getProductName()
+        );
+
+        existing.setPrice(
+                product.getPrice()
+        );
+
+        existing.setQuantity(
+                product.getQuantity()
+        );
+
+        return repository.save(existing);
+    }
+
+    // ================================
+    // SAVE PRODUCT
+    // ================================
+
+    public Product saveProduct(Product product) {
+
+        return repository.save(product);
+    }
+
+    // ================================
+    // DELETE PRODUCT
+    // ================================
+
+    public void deleteProduct(Long id) {
+
+        repository.deleteById(id);
+    }
+
+    // ================================
+    // CONFIRM PURCHASE REQUEST
+    // ================================
+
+    @Transactional
+    public Product confirmRequest(Long id) {
+
+        System.out.println("CONFIRM START");
+
+        Product product =
+                repository.findById(id).orElse(null);
+
+        System.out.println("PRODUCT FOUND");
+
+        if (product == null) {
+
+            throw new RuntimeException(
+                    "Product not found"
+            );
+        }
+
+        // Check request status
+
+        if (!"PENDING".equals(
+                product.getRequestStatus())) {
+
+            throw new RuntimeException(
+                    "No pending request"
+            );
+        }
+
+        // Check available quantity
+
+        if (product.getRequestedQuantity()
+                > product.getQuantity()) {
+
+            throw new RuntimeException(
+                    "Not enough quantity available"
+            );
+        }
+
+        // Reduce quantity only after confirmation
+
+        product.setQuantity(
+                product.getQuantity()
+                        - product.getRequestedQuantity()
+        );
+
+        // Change request status
+
+        product.setRequestStatus("APPROVED");
+
+        System.out.println("BEFORE SAVE");
+
+        Product saved =
+                repository.save(product);
+
+        System.out.println("AFTER SAVE");
+
+        return saved;
+    }
+
+    // ================================
+    // REJECT PURCHASE REQUEST
+    // ================================
+
+    @Transactional
+    public Product rejectRequest(Long id) {
+
+        System.out.println("REJECT START");
+
+        Product product =
+                repository.findById(id).orElse(null);
+
+        if (product == null) {
+
+            throw new RuntimeException(
+                    "Product not found"
+            );
+        }
+
+        // Check request status
+
+        if (!"PENDING".equals(
+                product.getRequestStatus())) {
+
+            throw new RuntimeException(
+                    "No pending request"
+            );
+        }
+
+        // Change status
+
+        product.setRequestStatus("REJECTED");
+
+        Product saved =
+                repository.save(product);
+
+        System.out.println("REJECT COMPLETE");
+
+        return saved;
+    }
+}

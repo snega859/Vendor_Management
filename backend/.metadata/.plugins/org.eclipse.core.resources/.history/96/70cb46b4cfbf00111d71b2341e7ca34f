@@ -1,0 +1,159 @@
+package com.example.backend.service;
+
+import com.example.backend.entity.Product;
+import com.example.backend.repository.ProductRepository;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class ProductService {
+
+    private final ProductRepository repository;
+
+    public ProductService(ProductRepository repository) {
+        this.repository = repository;
+    }
+
+
+    // Add Product
+    public Product addProduct(Product product) {
+
+        product.setRequestStatus("NONE");
+        product.setRequestedQuantity(0);
+        product.setRequestedBy(null);
+
+        return repository.save(product);
+    }
+
+
+    // Get All Products
+    public List<Product> getAllProducts() {
+
+        return repository.findAll();
+    }
+
+
+    // Get Product By ID
+    public Product getProduct(Long id) {
+
+        return repository.findById(id).orElse(null);
+    }
+
+
+    // Update Product
+    public Product updateProduct(
+            Long id,
+            Product product) {
+
+        Product existing =
+                repository.findById(id).orElse(null);
+
+        if (existing == null) {
+            return null;
+        }
+
+        existing.setProductName(
+                product.getProductName()
+        );
+
+        existing.setPrice(
+                product.getPrice()
+        );
+
+        existing.setQuantity(
+                product.getQuantity()
+        );
+
+        return repository.save(existing);
+    }
+
+
+    // Save Product
+    public Product saveProduct(Product product) {
+
+        return repository.save(product);
+    }
+
+
+    // Delete Product
+    public void deleteProduct(Long id) {
+
+        repository.deleteById(id);
+    }
+
+
+    // Confirm Request
+    @Transactional
+    public Product confirmRequest(Long id) {
+
+        Product product =
+                repository.findById(id).orElse(null);
+
+        if (product == null) {
+            throw new RuntimeException(
+                    "Product not found"
+            );
+        }
+
+        if (!"PENDING".equals(
+                product.getRequestStatus())) {
+
+            throw new RuntimeException(
+                    "No pending request"
+            );
+        }
+
+        if (product.getRequestedQuantity()
+                > product.getQuantity()) {
+
+            throw new RuntimeException(
+                    "Not enough quantity available"
+            );
+        }
+
+        // Reduce quantity
+        product.setQuantity(
+                product.getQuantity()
+                        - product.getRequestedQuantity()
+        );
+
+        // Change status
+        product.setRequestStatus(
+                "APPROVED"
+        );
+
+        return repository.save(product);
+    }
+
+
+    // Reject Request
+    @Transactional
+    public Product rejectRequest(Long id) {
+
+        Product product =
+                repository.findById(id).orElse(null);
+
+        if (product == null) {
+            throw new RuntimeException(
+                    "Product not found"
+            );
+        }
+
+        if (!"PENDING".equals(
+                product.getRequestStatus())) {
+
+            throw new RuntimeException(
+                    "No pending request"
+            );
+        }
+
+        product.setRequestStatus(
+                "REJECTED"
+        );
+
+        return repository.save(product);
+    }
+}

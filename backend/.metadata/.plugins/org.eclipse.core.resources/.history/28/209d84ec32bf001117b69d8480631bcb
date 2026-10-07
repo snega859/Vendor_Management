@@ -1,0 +1,70 @@
+package com.example.backend.controller;
+
+import com.example.backend.entity.Vendor;
+import com.example.backend.repository.VendorRepository;
+
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/vendors")
+@CrossOrigin(origins = "http://localhost:5173")
+public class VendorController {
+
+    private final VendorRepository vendorRepository;
+
+    public VendorController(VendorRepository vendorRepository) {
+        this.vendorRepository = vendorRepository;
+    }
+
+    // REGISTER VENDOR
+    @PostMapping("/register")
+    public Vendor registerVendor(@RequestBody Vendor vendor) {
+
+        vendor.setStatus("ACTIVE");
+
+        return vendorRepository.save(vendor);
+    }
+
+    // GET ALL VENDORS
+    @GetMapping
+    public List<Vendor> getAllVendors() {
+
+        return vendorRepository.findAll();
+    }
+
+    // UPDATE VENDOR
+    @PutMapping("/{id}")
+    public Vendor updateVendor(
+            @PathVariable Long id,
+            @RequestBody Vendor vendor) {
+
+        Vendor existingVendor =
+                vendorRepository.findById(id).orElse(null);
+
+        if (existingVendor == null) {
+            return null;
+        }
+
+        existingVendor.setVendorName(vendor.getVendorName());
+        existingVendor.setCompanyName(vendor.getCompanyName());
+        existingVendor.setEmail(vendor.getEmail());
+        existingVendor.setPhone(vendor.getPhone());
+        existingVendor.setAddress(vendor.getAddress());
+        existingVendor.setUsername(vendor.getUsername());
+        existingVendor.setPassword(vendor.getPassword());
+        existingVendor.setStatus(vendor.getStatus());
+
+        return vendorRepository.save(existingVendor);
+    }
+
+    // DELETE VENDOR
+    @DeleteMapping("/{id}")
+    public String deleteVendor(@PathVariable Long id) {
+
+        vendorRepository.deleteById(id);
+
+        return "Vendor deleted successfully";
+    }
+}

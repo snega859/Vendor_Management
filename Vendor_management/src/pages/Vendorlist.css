@@ -1,0 +1,289 @@
+.vl-page {
+  min-height: 100vh;
+  background: #f1f3f8;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #14182b;
+}
+
+.vl-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem clamp(1rem, 4vw, 2.5rem);
+  background: #fff;
+  border-bottom: 1px solid #e0e4f0;
+}
+
+.vl-brand {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #3347ff;
+}
+
+.vl-btn {
+  padding: 0.5rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  color: #14182b;
+  background: #fff;
+  border: 1px solid #cfd4e4;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.vl-btn:hover {
+  background: #f1f3f8;
+}
+
+.vl-btn.primary {
+  color: #fff;
+  background: #3347ff;
+  border-color: #3347ff;
+}
+
+.vl-btn.primary:hover {
+  background: #2536d6;
+}
+
+.vl-btn.danger {
+  color: #b3261e;
+  border-color: #f0c4c1;
+}
+
+.vl-btn.danger:hover {
+  background: #ffeceb;
+}
+
+.vl-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem clamp(1rem, 4vw, 2.5rem) 3rem;
+}
+
+.vl-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.vl-head h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+.vl-head p {
+  margin: 0.3rem 0 0;
+  color: #5d647c;
+}
+
+.vl-status {
+  margin: 0 0 1.2rem;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.92rem;
+  border-radius: 8px;
+}
+
+.vl-status.ok {
+  color: #11694f;
+  background: #e3f6ee;
+}
+
+.vl-status.err {
+  color: #b3261e;
+  background: #ffeceb;
+}
+
+.vl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 1.2rem;
+}
+
+.vl-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 14px;
+  border-top: 5px solid #3347ff;
+  padding: 1.2rem;
+  box-shadow: 0 6px 20px rgba(20, 24, 43, 0.06);
+}
+
+.vl-card.inactive {
+  border-top-color: #aeb4c6;
+}
+
+.vl-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.vl-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  font-weight: 700;
+  color: #3347ff;
+  background: #e5e8ff;
+  border-radius: 12px;
+}
+
+.inactive .vl-avatar {
+  color: #5d647c;
+  background: #eceef5;
+}
+
+.vl-title {
+  min-width: 0;
+  flex: 1;
+}
+
+.vl-title h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.vl-title span {
+  font-size: 0.88rem;
+  color: #5d647c;
+}
+
+.vl-pill {
+  flex: none;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #11694f;
+  background: #e3f6ee;
+  border-radius: 999px;
+}
+
+.vl-pill.off {
+  color: #5d647c;
+  background: #eceef5;
+}
+
+.vl-details {
+  margin: 1rem 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.45rem 0.9rem;
+  font-size: 0.92rem;
+}
+
+.vl-details dt {
+  color: #5d647c;
+}
+
+.vl-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.vl-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.vl-actions .vl-btn {
+  flex: 1;
+}
+
+.vl-empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #5d647c;
+  background: #fff;
+  border-radius: 14px;
+}
+
+.vl-empty p {
+  margin: 0 0 1rem;
+}
+
+/* edit dialog */
+.vl-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(20, 24, 43, 0.5);
+  overflow-y: auto;
+}
+
+.vl-dialog {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 20px 50px rgba(20, 24, 43, 0.3);
+}
+
+.vl-dialog h2 {
+  margin: 0 0 1.1rem;
+  font-size: 1.3rem;
+}
+
+.vl-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem 1rem;
+}
+
+.vl-wide {
+  grid-column: 1 / -1;
+}
+
+.vl-field label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.vl-field input,
+.vl-field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  border: 1px solid #cfd4e4;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.vl-field input:focus,
+.vl-field select:focus {
+  outline: 2px solid #3347ff;
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.vl-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.3rem;
+}
+
+.vl-page :focus-visible {
+  outline: 3px solid #3347ff;
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .vl-fields {
+    grid-template-columns: 1fr;
+  }
+}

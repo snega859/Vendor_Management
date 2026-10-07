@@ -1,0 +1,148 @@
+package com.example.backend.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.backend.entity.Product;
+import com.example.backend.service.ProductService;
+
+@RestController
+@RequestMapping("/api/products")
+@CrossOrigin(origins = "http://localhost:5173")
+public class ProductController {
+
+    private final ProductService service;
+
+    public ProductController(ProductService service) {
+        this.service = service;
+    }
+
+    // ================================
+    // ADD PRODUCT
+    // ================================
+
+    @PostMapping
+    public Product add(@RequestBody Product product) {
+
+        return service.addProduct(product);
+    }
+
+    // ================================
+    // GET ALL PRODUCTS
+    // ================================
+
+    @GetMapping
+    public List<Product> getAll() {
+
+        return service.getAllProducts();
+    }
+
+    // ================================
+    // GET PRODUCT BY ID
+    // ================================
+
+    @GetMapping("/{id}")
+    public Product getOne(@PathVariable Long id) {
+
+        return service.getProduct(id);
+    }
+
+    // ================================
+    // UPDATE PRODUCT
+    // ================================
+
+    @PutMapping("/{id}")
+    public Product update(
+            @PathVariable Long id,
+            @RequestBody Product product) {
+
+        return service.updateProduct(id, product);
+    }
+
+    // ================================
+    // DELETE PRODUCT
+    // ================================
+
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Long id) {
+
+        service.deleteProduct(id);
+
+        return "Product deleted successfully";
+    }
+
+    // ================================
+    // USER PLACE PURCHASE REQUEST
+    // ================================
+
+    @PutMapping("/{id}/request")
+    public Product placeRequest(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> request) {
+
+        Product product = service.getProduct(id);
+
+        if (product == null) {
+            throw new RuntimeException("Product not found");
+        }
+
+        int requestedQuantity =
+                ((Number) request.get("requestedQuantity")).intValue();
+
+        String requestedBy =
+                (String) request.get("requestedBy");
+
+        if (requestedQuantity <= 0) {
+            throw new RuntimeException(
+                    "Please enter a valid quantity"
+            );
+        }
+
+        if (requestedQuantity > product.getQuantity()) {
+            throw new RuntimeException(
+                    "Requested quantity is not available"
+            );
+        }
+
+        product.setRequestedQuantity(requestedQuantity);
+
+        product.setRequestedBy(requestedBy);
+
+        product.setRequestStatus("PENDING");
+
+        return service.saveProduct(product);
+    }
+
+ // ================================
+ // ADMIN CONFIRM REQUEST
+ // ================================
+
+ @PutMapping("/{id}/confirm")
+ public Product confirmRequest(
+         @PathVariable Long id) {
+
+     return service.confirmRequest(id);
+ }
+
+
+ // ================================
+ // ADMIN REJECT REQUEST
+ // ================================
+
+ @PutMapping("/{id}/reject")
+ public Product rejectRequest(
+         @PathVariable Long id) {
+
+     return service.rejectRequest(id);
+ }
+}

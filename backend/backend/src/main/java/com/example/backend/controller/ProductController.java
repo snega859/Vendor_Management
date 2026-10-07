@@ -1,0 +1,227 @@
+package com.example.backend.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.bind.annotation.*;
+
+import com.example.backend.entity.Product;
+import com.example.backend.service.ProductService;
+
+@RestController
+@RequestMapping("/api/products")
+@CrossOrigin(origins = "http://localhost:5173")
+public class ProductController {
+
+    private final ProductService service;
+
+    public ProductController(ProductService service) {
+
+        this.service = service;
+    }
+
+    // ==================================================
+    // ADD PRODUCT
+    // ==================================================
+
+    @PostMapping
+    public Product add(
+            @RequestBody Product product) {
+
+        return service.addProduct(product);
+    }
+
+    // ==================================================
+    // GET ALL PRODUCTS
+    // ==================================================
+
+    @GetMapping
+    public List<Product> getAll() {
+
+        return service.getAllProducts();
+    }
+
+    // ==================================================
+    // GET ONE PRODUCT
+    // ==================================================
+
+    @GetMapping("/{id}")
+    public Product getOne(
+            @PathVariable Long id) {
+
+        return service.getProduct(id);
+    }
+
+    // ==================================================
+    // UPDATE PRODUCT
+    // ==================================================
+
+    @PutMapping("/{id}")
+    public Product update(
+            @PathVariable Long id,
+            @RequestBody Product product) {
+
+        return service.updateProduct(
+                id,
+                product
+        );
+    }
+
+    // ==================================================
+    // DELETE PRODUCT
+    // ==================================================
+
+    @DeleteMapping("/{id}")
+    public String delete(
+            @PathVariable Long id) {
+
+        service.deleteProduct(id);
+
+        return "Product deleted successfully";
+    }
+
+    // ==================================================
+    // VENDOR PLACE REQUEST
+    // ==================================================
+
+    @PutMapping("/{id}/request")
+    public Product placeRequest(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> request) {
+
+        Product product =
+                service.getProduct(id);
+
+        if (product == null) {
+
+            throw new RuntimeException(
+                    "Product not found"
+            );
+        }
+
+        // ----------------------------------------------
+        // GET REQUESTED QUANTITY
+        // ----------------------------------------------
+
+        Object quantityObject =
+                request.get("requestedQuantity");
+
+        if (quantityObject == null) {
+
+            throw new RuntimeException(
+                    "Requested quantity is required"
+            );
+        }
+
+        int requestedQuantity =
+                ((Number) quantityObject).intValue();
+
+        // ----------------------------------------------
+        // GET USERNAME
+        // ----------------------------------------------
+
+        String requestedBy =
+                (String) request.get("requestedBy");
+
+        if (requestedBy == null ||
+                requestedBy.trim().isEmpty()) {
+
+            throw new RuntimeException(
+                    "Username is required"
+            );
+        }
+
+        // ----------------------------------------------
+        // VALIDATE QUANTITY
+        // ----------------------------------------------
+
+        if (requestedQuantity <= 0) {
+
+            throw new RuntimeException(
+                    "Please enter a valid quantity"
+            );
+        }
+
+        if (requestedQuantity >
+                product.getQuantity()) {
+
+            throw new RuntimeException(
+                    "Requested quantity is not available"
+            );
+        }
+
+        // ----------------------------------------------
+        // SAVE REQUEST
+        // ----------------------------------------------
+
+        product.setRequestedQuantity(
+                requestedQuantity
+        );
+
+        product.setRequestedBy(
+                requestedBy
+        );
+
+        product.setRequestStatus(
+                "PENDING"
+        );
+
+        // ----------------------------------------------
+        // RESET OLD QUOTATION
+        // ----------------------------------------------
+
+        product.setQuotationStatus(
+                "NONE"
+        );
+
+        product.setSupplierName(
+                null
+        );
+
+        product.setQuotationTotal(
+                0.0
+        );
+
+        return service.saveProduct(product);
+    }
+
+    // ==================================================
+    // ADMIN CONFIRM REQUEST
+    // ==================================================
+
+    @PutMapping("/{id}/confirm")
+    public Product confirmRequest(
+            @PathVariable Long id) {
+
+        return service.confirmRequest(id);
+    }
+
+    // ==================================================
+    // ADMIN REJECT REQUEST
+    // ==================================================
+
+    @PutMapping("/{id}/reject")
+    public Product rejectRequest(
+            @PathVariable Long id) {
+
+        return service.rejectRequest(id);
+    }
+
+    // ==================================================
+    // ADMIN CONFIRM QUOTATION
+    // ==================================================
+
+    @PutMapping("/{id}/quotation-confirm")
+    public Product confirmQuotation(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+
+        String supplierName =
+                request.get("supplierName");
+
+        return service.confirmQuotation(
+                id,
+                supplierName
+        );
+    }
+}

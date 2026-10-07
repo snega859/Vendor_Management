@@ -1,0 +1,66 @@
+
+package com.example.backend.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.backend.entity.Vendor;
+import com.example.backend.repository.UserRepository;
+import com.example.backend.repository.VendorRepository;
+
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:5173")
+public class AuthController {
+
+    private final UserRepository userRepository;
+    private final VendorRepository vendorRepository;
+
+    public AuthController(UserRepository userRepository,
+                          VendorRepository vendorRepository) {
+        this.userRepository = userRepository;
+        this.vendorRepository = vendorRepository;
+    }
+
+    @PostMapping("/login")
+    public Map<String, String> login(@RequestBody Map<String, String> loginData) {
+
+        String username = loginData.get("username");
+        String password = loginData.get("password");
+
+        Map<String, String> response = new HashMap<>();
+
+        // Admin login
+        if (username.equals("admin") && password.equals("admin123")) {
+
+            response.put("message", "Login successful");
+            response.put("role", "ADMIN");
+
+            return response;
+        }
+
+        // Vendor login
+        Vendor vendor = vendorRepository
+                .findByUsername(username)
+                .orElse(null);
+
+        if (vendor != null && vendor.getPassword().equals(password)) {
+
+            response.put("message", "Login successful");
+            response.put("role", "VENDOR");
+
+            return response;
+        }
+
+        response.put("message", "Invalid username or password");
+        response.put("role", "INVALID");
+
+        return response;
+    }
+}
